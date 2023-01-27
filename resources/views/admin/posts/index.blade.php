@@ -11,6 +11,7 @@
                 </th>
                 <th scope="col">Body</th>
                 <th scope="col">Category</th>
+                <th scope="col">Tags</th>
                 <th scope="col">actions</th>
             </tr>
         </thead>
@@ -31,6 +32,12 @@
                             null
                         @endif
 
+                    </td>
+
+                    <td>
+                        @foreach ($elem->tags as $tag)
+                            {{ $tag->name }}
+                        @endforeach
                     </td>
                     <td class="justify-content-center">
                         <a class="" href="{{ route('admin.posts.edit', $elem->id) }}">

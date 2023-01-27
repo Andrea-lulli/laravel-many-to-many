@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Post;
 use App\Category;
+use App\Tag;
 
 class PostController extends Controller
 {
@@ -31,9 +32,10 @@ class PostController extends Controller
     public function create()
     {
         $categories = Category::All();
+        $tags = Tag::All();
 
 
-        return view('admin.posts.create', compact('categories'));
+        return view('admin.posts.create', compact('categories','tags'));
     }
 
     /**
@@ -55,6 +57,14 @@ class PostController extends Controller
         $newpost = new Post();
         $newpost->fill($data);
         $newpost->save();
+
+
+
+        if (array_key_exists('tags' , $data)) {
+
+            $newpost->tags()->sync( $data['tags'] );
+        }
+        ;
 
         return redirect()->route('admin.posts.index');
     }
@@ -84,7 +94,9 @@ class PostController extends Controller
 
         $categories = Category::All();
 
-        return view('admin.posts.edit', compact('post', 'categories'));
+        $tags = Tag::All();
+
+        return view('admin.posts.edit', compact('post', 'categories', 'tags'));
     }
 
     /**
@@ -101,6 +113,14 @@ class PostController extends Controller
 
         $singolo_post->update($data);
 
+        if (array_key_exists('tags' , $data)) {
+
+            $singolo_post->tags()->sync( $data['tags'] );
+        } else {
+            $singolo_post->tags()->sync([]);
+        }
+        ;
+
         return redirect()->route('admin.posts.index', $singolo_post->id);
     }
 
@@ -113,6 +133,8 @@ class PostController extends Controller
     public function destroy($id)
     {
         $singolo_post = Post::findOrFail($id);
+
+        $singolo_post->tags()->sync([]);
 
         $singolo_post->delete();
 

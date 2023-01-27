@@ -39,11 +39,15 @@
                     </option>
                 @endforeach
             </select>
-
         </div>
 
-
-
+        <div class="mb-3">
+            <label for="" class="form-label">Tag</label>
+            @foreach ( $tags as $tag )
+            <input type="checkbox" name="tags[]" value="{{ $tag->id }}">
+            {{$tag->name}}
+            @endforeach
+        </div>
 
         <button type="submit" class="btn btn-primary">Crea</button>
     </form>
