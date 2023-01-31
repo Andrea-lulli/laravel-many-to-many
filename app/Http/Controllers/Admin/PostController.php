@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Post;
 use App\Category;
 use App\Tag;
+use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
@@ -18,7 +19,7 @@ class PostController extends Controller
     public function index()
     {
         $data = [
-            'posts' => Post::with('category' , 'tags')->paginate(10)
+            'posts' => Post::with('category', 'tags')->paginate(10)
         ];
 
         return view('admin.posts.index', $data);
@@ -35,7 +36,7 @@ class PostController extends Controller
         $tags = Tag::All();
 
 
-        return view('admin.posts.create', compact('categories','tags'));
+        return view('admin.posts.create', compact('categories', 'tags'));
     }
 
     /**
@@ -48,6 +49,7 @@ class PostController extends Controller
     {
 
         $data = $request->all();
+        //dd($data);
 
         $request->validate([
             'title' => 'required',
@@ -55,16 +57,25 @@ class PostController extends Controller
         ]);
 
         $newpost = new Post();
+
+        if (array_key_exists('image', $data)) {
+
+            $cover_url = Storage::put('post_covers', $data['image']);
+            $data['cover'] = $cover_url;
+        };
+
+
+
         $newpost->fill($data);
         $newpost->save();
 
 
 
-        if (array_key_exists('tags' , $data)) {
+        if (array_key_exists('tags', $data)) {
 
-            $newpost->tags()->sync( $data['tags'] );
-        }
-        ;
+            $newpost->tags()->sync($data['tags']);
+        };
+
 
         return redirect()->route('admin.posts.index');
     }
@@ -113,13 +124,12 @@ class PostController extends Controller
 
         $singolo_post->update($data);
 
-        if (array_key_exists('tags' , $data)) {
+        if (array_key_exists('tags', $data)) {
 
-            $singolo_post->tags()->sync( $data['tags'] );
+            $singolo_post->tags()->sync($data['tags']);
         } else {
             $singolo_post->tags()->sync([]);
-        }
-        ;
+        };
 
         return redirect()->route('admin.posts.index', $singolo_post->id);
     }
@@ -133,6 +143,10 @@ class PostController extends Controller
     public function destroy($id)
     {
         $singolo_post = Post::findOrFail($id);
+
+        if ($singolo_post->cover) {
+            Storage::delete($singolo_post->cover);
+        };
 
         $singolo_post->tags()->sync([]);
 

@@ -6,7 +6,7 @@
 
     </div>
 
-    <form action="{{ route('admin.posts.store') }}" method="POST">
+    <form action="{{ route('admin.posts.store') }}" method="POST" enctype="multipart/form-data">
 
         @csrf
 
@@ -47,6 +47,11 @@
             <input type="checkbox" name="tags[]" value="{{ $tag->id }}">
             {{$tag->name}}
             @endforeach
+        </div>
+
+        <div class="mb-3" >
+            <label for="" class="form-label">Inserisci Immagine </label>
+            <input type="file" name="image" class="form-control-file">
         </div>
 
         <button type="submit" class="btn btn-primary">Crea</button>
