@@ -7,7 +7,10 @@ use Illuminate\Http\Request;
 use App\Post;
 use App\Category;
 use App\Tag;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\CreatePostMail;
 
 class PostController extends Controller
 {
@@ -75,6 +78,12 @@ class PostController extends Controller
 
             $newpost->tags()->sync($data['tags']);
         };
+
+
+        $mail = new CreatePostMail($newpost);
+        $email_utente = Auth::user()->email;
+        Mail::to($email_utente )->send($mail);
+
 
 
         return redirect()->route('admin.posts.index');
